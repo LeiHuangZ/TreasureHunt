@@ -53,7 +53,7 @@ public class TreasureView extends RelativeLayout {
         mUnbinder = ButterKnife.bind(mView);
     }
 
-    public void bindView(Treasure treasure){
+    public void bindView(Treasure treasure) {
         String mTitle = treasure.getTitle();
         String mLocation = treasure.getLocation();
         double mLatitude = treasure.getLatitude();

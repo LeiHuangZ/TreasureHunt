@@ -2,11 +2,11 @@
 <!--DrawerLayout 抽屉-->
 <!--里面包括两个部分：1. 展示的布局，2. 侧滑的布局:侧滑菜单-->
 <android.support.v4.widget.DrawerLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    android:layout_height="match_parent">
 
     <!--主页面显示-->
     <include
@@ -23,9 +23,9 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:layout_marginTop="?attr/actionBarSize"
-        app:menu="@menu/menu_drawer"
         app:headerLayout="@layout/layout_navi_header"
         app:itemTextColor="@color/selector_nav_icon_colors"
+        app:menu="@menu/menu_drawer"
         />
 
 </android.support.v4.widget.DrawerLayout>

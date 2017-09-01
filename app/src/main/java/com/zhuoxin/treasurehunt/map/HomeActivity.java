@@ -44,7 +44,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
         userIcon = ((ImageView) mNavigation.getHeaderView(0).findViewById(R.id.iv_usericon));//找到头像控件
 
         setSupportActionBar(mToolbar);
-        if (getSupportActionBar() != null){
+        if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayShowTitleEnabled(false);
         }
 
@@ -59,7 +59,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     protected void onStart() {
         super.onStart();
         String mPhoto = UserPrefs.getInstance().getPhoto();
-        Log.e("mPhoto", "onStart: "+mPhoto );
+        Log.e("mPhoto", "onStart: " + mPhoto);
         if (mPhoto != null) {
             Picasso.with(this).load(mPhoto).into(userIcon);
         }
@@ -68,7 +68,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     //----------------------------------侧滑菜单的点击监听的实现----------------------------------------//
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()){
+        switch (item.getItemId()) {
             case R.id.menu_hide:
                 ((MapFragment) getSupportFragmentManager().findFragmentById(R.id.mapFragment)).changeUIMode(MapFragment.TREASURE_MODE_BURY);
                 mDrawerLayout.closeDrawer(Gravity.START);

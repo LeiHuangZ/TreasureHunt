@@ -2,6 +2,8 @@ package com.zhuoxin.treasurehunt.net;
 
 import com.zhuoxin.treasurehunt.treasure.Area;
 import com.zhuoxin.treasurehunt.treasure.Treasure;
+import com.zhuoxin.treasurehunt.treasure.detail.TreasureDetail;
+import com.zhuoxin.treasurehunt.treasure.detail.TreasureDetailResult;
 import com.zhuoxin.treasurehunt.user.User;
 import com.zhuoxin.treasurehunt.user.login.LoginResult;
 import com.zhuoxin.treasurehunt.user.register.RegisterResult;
@@ -30,5 +32,9 @@ public interface RetrofitAPI {
     //根据区域获取宝藏
     @POST("/Handler/TreasureHandler.ashx?action=show")
     Call<List<Treasure>> getTreasure(@Body Area area);
+
+    //获取宝藏详情
+    @POST("/Handler/TreasureHandler.ashx?action=tdetails")
+    Call<List<TreasureDetailResult>> getTreasureDetailResult(@Body TreasureDetail treasureDetail);
 
 }

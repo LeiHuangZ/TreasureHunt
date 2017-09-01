@@ -271,7 +271,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
 
     }
 
-    //---------------------------------地图覆盖物点击监听的实现------------------------//
+    //---------------------------------地图覆盖物（即：圆点）点击监听的实现------------------------//
     private Marker mCurrentMarker;
     private BaiduMap.OnMarkerClickListener mOnMarkerClickListener = new BaiduMap.OnMarkerClickListener() {
         @Override
@@ -294,6 +294,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
         }
     };
 
+    //根据区域获取宝藏信息
     private void updateMapView(MapStatus mapStatus) {
         //获取宝藏信息
         LatLng mLatLng = mapStatus.target;
