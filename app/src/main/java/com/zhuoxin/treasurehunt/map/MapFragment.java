@@ -93,6 +93,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
     private static LatLng currentLatLng;
     private BitmapDescriptor mBitmapDescriptor;
     private BitmapDescriptor infoBitmap;
+    private static String mAddrStr;
 
     @Nullable
     @Override
@@ -186,7 +187,8 @@ public class MapFragment extends Fragment implements MapFragmentView {
             double mAltitude = bdLocation.getLatitude();//纬度
 
             mLatLng = new LatLng(mAltitude, mLongitude);
-            String mAddrStr = bdLocation.getAddrStr();//详细地理位置
+            //详细地理位置
+            mAddrStr = bdLocation.getAddrStr();
 
             Log.e("===================", "经度：" + mLongitude + " 纬度：" + mAltitude + " 地理位置：" + mAddrStr);
 
@@ -218,7 +220,9 @@ public class MapFragment extends Fragment implements MapFragmentView {
                 .mapStatus(mMapStatus)
                 .rotateGesturesEnabled(true)
                 .zoomControlsEnabled(false)
-                .scaleControlEnabled(false);
+                .scaleControlEnabled(false)
+                .zoomGesturesEnabled(true);
+
         MapView mMapView = new MapView(getContext(), baiduMapOptions);
         mBaiduMap = mMapView.getMap();
         mMapFrame.addView(mMapView, 0);
@@ -387,8 +391,14 @@ public class MapFragment extends Fragment implements MapFragmentView {
 
     }
 
+    //获取当前位置坐标
     public static LatLng getLocation() {
         return currentLatLng;
+    }
+
+    //获取当前位置信息
+    public static String getAddress() {
+        return mAddrStr;
     }
 
     @Override

@@ -4,8 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -17,13 +17,18 @@ import com.baidu.mapapi.map.MapStatus;
 import com.baidu.mapapi.map.MapView;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.navi.BaiduMapNavigation;
+import com.baidu.mapapi.navi.NaviParaOption;
+import com.baidu.mapapi.utils.OpenClientUtil;
 import com.zhuoxin.treasurehunt.R;
 import com.zhuoxin.treasurehunt.commons.ActivityUtils;
 import com.zhuoxin.treasurehunt.custom.TreasureView;
+import com.zhuoxin.treasurehunt.map.MapFragment;
 import com.zhuoxin.treasurehunt.treasure.Treasure;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 public class TreasureDetailActivity extends AppCompatActivity implements TreasureDetailView {
 
@@ -115,5 +120,45 @@ public class TreasureDetailActivity extends AppCompatActivity implements Treasur
     @Override
     public void showResult(String result) {
         mActivityUtils.showToast(result);
+    }
+
+    @OnClick(R.id.iv_navigation)
+    public void onViewClicked() {
+        PopupMenu mPopupMenu = new PopupMenu(this, mIvNavigation);
+        mPopupMenu.inflate(R.menu.menu_navigation);
+        mPopupMenu.show();
+
+        LatLng startLocation = MapFragment.getLocation();
+        String startAddr = MapFragment.getAddress();
+
+        String endAddr = mTreasure.getTitle();
+        LatLng endLocation = new LatLng(mTreasure.getLatitude(), mTreasure.getLongitude());
+
+        final NaviParaOption mNaviParaOption = new NaviParaOption();
+        mNaviParaOption.startPoint(startLocation)
+                .startName(startAddr)
+                .endPoint(endLocation)
+                .endName(endAddr);
+
+        mPopupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem item) {
+                switch (item.getItemId()){
+                    case R.id.walking_navi:
+                        boolean mB = BaiduMapNavigation.openBaiduMapWalkNavi(mNaviParaOption, TreasureDetailActivity.this);
+                        if (!mB){
+                            OpenClientUtil.getLatestBaiduMapApp(TreasureDetailActivity.this);
+                        }
+                        break;
+                    case R.id.biking_navi:
+                        boolean mB1 = BaiduMapNavigation.openBaiduMapBikeNavi(mNaviParaOption, TreasureDetailActivity.this);
+                        if (!mB1){
+                            OpenClientUtil.getLatestBaiduMapApp(TreasureDetailActivity.this);
+                        }
+                        break;
+                }
+                return false;
+            }
+        });
     }
 }

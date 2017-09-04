@@ -39,8 +39,9 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+
         ButterKnife.bind(this);
-        mActivityUtils = new ActivityUtils(this);
+        mActivityUtils = new ActivityUtils(HomeActivity.this);
         userIcon = ((ImageView) mNavigation.getHeaderView(0).findViewById(R.id.iv_usericon));//找到头像控件
 
         setSupportActionBar(mToolbar);
@@ -82,6 +83,7 @@ public class HomeActivity extends AppCompatActivity implements NavigationView.On
             case R.id.menu_logout://退出登录
                 UserPrefs.getInstance().clearUser();//清除用户数据
                 mActivityUtils.startActivity(MainActivity.class);
+                finish();
                 break;
         }
         return false;

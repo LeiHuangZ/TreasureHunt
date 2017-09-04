@@ -1,7 +1,5 @@
 package com.zhuoxin.treasurehunt.user.login;
 
-import android.util.Log;
-
 import com.zhuoxin.treasurehunt.net.RetrofitClient;
 import com.zhuoxin.treasurehunt.user.User;
 import com.zhuoxin.treasurehunt.user.UserPrefs;
@@ -33,7 +31,6 @@ class LoginPresenter {
             @Override
             public void onResponse(Call<LoginResult> call, Response<LoginResult> response) {
                 mLoginView.hideProgress();//隐藏进度条
-                Log.e("TAG", "onResponse: " + response.message());
                 if (response.isSuccessful()) {//如果相应结果为成功的话
                     LoginResult mLoginResult = response.body();
                     if (mLoginResult == null) {
@@ -43,16 +40,17 @@ class LoginPresenter {
                     int mErrcode = mLoginResult.getErrcode();
                     if (mErrcode == 1) {// 登录成功
                         //存储用户信息
-                        UserPrefs.getInstance().setPhoto(RetrofitClient.BASE_URL+mLoginResult.getHeadpic());
+                        UserPrefs.getInstance().setPhoto(RetrofitClient.BASE_URL + mLoginResult.getHeadpic());
                         UserPrefs.getInstance().setTokenid(mLoginResult.getTokenid());
                         mLoginView.loginSuccess();//通知View登录成功
                     } else {//登录失败
                         mLoginView.loginFail();//通知View登录失败
                     }
                     mLoginView.showResult(mLoginResult.getErrmsg());
+                } else {
+                    mLoginView.loginFail();
+                    mLoginView.showResult(response.body().getErrmsg());
                 }
-                mLoginView.loginFail();
-                mLoginView.showResult(response.body().getErrmsg());
             }
 
             @Override
