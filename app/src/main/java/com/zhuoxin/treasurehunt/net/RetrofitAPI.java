@@ -4,6 +4,8 @@ import com.zhuoxin.treasurehunt.treasure.Area;
 import com.zhuoxin.treasurehunt.treasure.Treasure;
 import com.zhuoxin.treasurehunt.treasure.detail.TreasureDetail;
 import com.zhuoxin.treasurehunt.treasure.detail.TreasureDetailResult;
+import com.zhuoxin.treasurehunt.treasure.hide.HideTreasure;
+import com.zhuoxin.treasurehunt.treasure.hide.HideTreasureResult;
 import com.zhuoxin.treasurehunt.user.User;
 import com.zhuoxin.treasurehunt.user.login.LoginResult;
 import com.zhuoxin.treasurehunt.user.register.RegisterResult;
@@ -36,5 +38,9 @@ public interface RetrofitAPI {
     //获取宝藏详情
     @POST("/Handler/TreasureHandler.ashx?action=tdetails")
     Call<List<TreasureDetailResult>> getTreasureDetailResult(@Body TreasureDetail treasureDetail);
+
+    //宝藏上传
+    @POST("/Handler/TreasureHandler.ashx?action=hide")
+    Call<HideTreasureResult> hideTreasure(@Body HideTreasure hideTreasure);
 
 }

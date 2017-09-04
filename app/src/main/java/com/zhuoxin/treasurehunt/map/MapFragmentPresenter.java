@@ -24,6 +24,12 @@ class MapFragmentPresenter {
     }
 
     void getTreasureByArea(Area area) {
+        if (TreasureRepo.getInstance().isCached(area)) {
+            mView.showTreasure(TreasureRepo.getInstance().getTreasure());
+            return;
+        }
+        TreasureRepo.getInstance().clear();
+
         RetrofitClient.getInstance().getAPI().getTreasure(area).enqueue(new Callback<List<Treasure>>() {
             @Override
             public void onResponse(Call<List<Treasure>> call, Response<List<Treasure>> response) {
@@ -33,12 +39,11 @@ class MapFragmentPresenter {
                         //展示吐司
                         mView.showMessage("未知错误");
                     }
-
                     //存储宝藏信息
                     TreasureRepo.getInstance().addTreasure(mTreasureList);
                     //展示宝藏信息
                     mView.showTreasure(mTreasureList);
-                }else {
+                } else {
                     mView.showMessage("服务器响应异常");
                 }
             }

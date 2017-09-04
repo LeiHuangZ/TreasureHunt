@@ -54,8 +54,10 @@
         <activity android:name=".user.login.LoginActivity"/>
         <activity
             android:name=".map.HomeActivity"
-            android:launchMode="singleTop"/>
+            android:launchMode="singleTask"/>
         <activity android:name=".treasure.detail.TreasureDetailActivity"/>
+        <activity android:name=".treasure.hide.HideTreasureActivity">
+        </activity>
     </application>
 
 </manifest>

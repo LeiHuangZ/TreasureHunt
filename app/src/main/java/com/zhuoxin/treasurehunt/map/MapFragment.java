@@ -7,11 +7,14 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.ContextCompat;
+import android.support.v7.widget.CardView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -36,6 +39,12 @@ import com.baidu.mapapi.map.Marker;
 import com.baidu.mapapi.map.MarkerOptions;
 import com.baidu.mapapi.map.MyLocationData;
 import com.baidu.mapapi.model.LatLng;
+import com.baidu.mapapi.search.core.SearchResult;
+import com.baidu.mapapi.search.geocode.GeoCodeResult;
+import com.baidu.mapapi.search.geocode.GeoCoder;
+import com.baidu.mapapi.search.geocode.OnGetGeoCoderResultListener;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeOption;
+import com.baidu.mapapi.search.geocode.ReverseGeoCodeResult;
 import com.zhuoxin.treasurehunt.R;
 import com.zhuoxin.treasurehunt.commons.ActivityUtils;
 import com.zhuoxin.treasurehunt.custom.TreasureView;
@@ -43,6 +52,7 @@ import com.zhuoxin.treasurehunt.treasure.Area;
 import com.zhuoxin.treasurehunt.treasure.Treasure;
 import com.zhuoxin.treasurehunt.treasure.TreasureRepo;
 import com.zhuoxin.treasurehunt.treasure.detail.TreasureDetailActivity;
+import com.zhuoxin.treasurehunt.treasure.hide.HideTreasureActivity;
 
 import java.util.List;
 
@@ -86,6 +96,14 @@ public class MapFragment extends Fragment implements MapFragmentView {
     TreasureView mTreasureView;
     @BindView(R.id.hide_treasure)
     RelativeLayout mHideTreasure;
+    @BindView(R.id.tv_currentLocation)
+    TextView mTvCurrentLocation;
+    @BindView(R.id.iv_toTreasureInfo)
+    ImageView mIvToTreasureInfo;
+    @BindView(R.id.et_treasureTitle)
+    EditText mEtTreasureTitle;
+    @BindView(R.id.cardView)
+    CardView mCardView;
     private BaiduMap mBaiduMap;
     private LocationClient mLocationClient;
     private ActivityUtils mActivityUtils;
@@ -94,6 +112,9 @@ public class MapFragment extends Fragment implements MapFragmentView {
     private BitmapDescriptor mBitmapDescriptor;
     private BitmapDescriptor infoBitmap;
     private static String mAddrStr;
+    private GeoCoder mGeoCoder;
+    private String mCurrentAddress;
+    private boolean isFirst = true;
 
     @Nullable
     @Override
@@ -111,14 +132,46 @@ public class MapFragment extends Fragment implements MapFragmentView {
 
         initMapView();//地图初始化
 
+        //地理编码
+        initGeoCoder();
+
         return view;
     }
 
+    //初始化地理编码
+    private void initGeoCoder() {
+        mGeoCoder = GeoCoder.newInstance();
+        mGeoCoder.setOnGetGeoCodeResultListener(mOnGetGeoCoderResultListener);
+    }
+
+    //地图编码结果的监听
+    private OnGetGeoCoderResultListener mOnGetGeoCoderResultListener = new OnGetGeoCoderResultListener() {
+        @Override
+        public void onGetGeoCodeResult(GeoCodeResult geoCodeResult) {
+
+        }
+
+        @Override
+        public void onGetReverseGeoCodeResult(ReverseGeoCodeResult reverseGeoCodeResult) {
+            if (reverseGeoCodeResult == null || reverseGeoCodeResult.error != SearchResult.ERRORNO.NO_ERROR) {
+                mCurrentAddress = "未知地址";
+            } else {
+                mCurrentAddress = reverseGeoCodeResult.getAddress();
+            }
+            mTvCurrentLocation.setText(mCurrentAddress);
+        }
+    };
+
+    //------------------------------------改变界面模式--------------------------------------------//
     public static final int TREASURE_MODE_NORMAL = 0;//正常模式
     public static final int TREASURE_MODE_SELECTED = 1;//marker被选中的状态
     public static final int TREASURE_MODE_BURY = 2;//埋藏宝藏状态
+    private int mCurrentMode;//
 
     public void changeUIMode(int mode) {
+        if (mCurrentMode == mode) {
+            return;
+        }
         switch (mode) {
             case TREASURE_MODE_NORMAL:
                 if (mCurrentMarker != null) {//如果前一次被选择的覆盖物不为空
@@ -154,6 +207,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
                 });
                 break;
         }
+        mCurrentMode = mode;
     }
 
     private void initLocation() {
@@ -177,6 +231,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
         //第四步，启动定位
         mLocationClient.start();
     }
+
 
     private LatLng mLatLng;
     //-------------------------------------------定位监听的实现-------------------------------------------//
@@ -205,6 +260,8 @@ public class MapFragment extends Fragment implements MapFragmentView {
         }
     };
 
+    private LatLng mTargetLatlng;//埋藏宝藏的目标点
+
     private void initMapView() {
         //获取宝藏展示的图标
         mBitmapDescriptor = BitmapDescriptorFactory.fromResource(R.mipmap.treasure_dot);
@@ -230,6 +287,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
 
         //添加地图状态改变监听
         mBaiduMap.setOnMapStatusChangeListener(new BaiduMap.OnMapStatusChangeListener() {
+
             @Override
             public void onMapStatusChangeStart(MapStatus mapStatus) {
 
@@ -242,8 +300,12 @@ public class MapFragment extends Fragment implements MapFragmentView {
 
             @Override
             public void onMapStatusChangeFinish(MapStatus mapStatus) {
-                if (mapStatus.target != currentLatLng) {
-                    updateMapView(mapStatus);
+                mTargetLatlng = mapStatus.target;
+                if (mTargetLatlng != currentLatLng) {
+                    updateMapView(mapStatus.target);
+                    if (mCurrentMode == TREASURE_MODE_BURY) {
+                        mGeoCoder.reverseGeoCode(new ReverseGeoCodeOption().location(mapStatus.target));
+                    }
                 }
                 currentLatLng = mapStatus.target;
             }
@@ -299,11 +361,10 @@ public class MapFragment extends Fragment implements MapFragmentView {
     };
 
     //根据区域获取宝藏信息
-    private void updateMapView(MapStatus mapStatus) {
+    private void updateMapView(LatLng latLng) {
         //获取宝藏信息
-        LatLng mLatLng = mapStatus.target;
-        double mLatitude = mLatLng.latitude;//纬度
-        double mLongitude = mLatLng.longitude;//经度
+        double mLatitude = latLng.latitude;//纬度
+        double mLongitude = latLng.longitude;//经度
         Area mArea = new Area();
         mArea.setMaxLat(Math.ceil(mLatitude));
         mArea.setMinLat(Math.floor(mLatitude));
@@ -318,7 +379,17 @@ public class MapFragment extends Fragment implements MapFragmentView {
         unbinder.unbind();
     }
 
-    @OnClick({R.id.iv_scaleUp, R.id.iv_scaleDown, R.id.tv_located, R.id.tv_satellite, R.id.tv_compass})
+    @Override
+    public void onStart() {
+        super.onStart();
+        if (!isFirst) {
+            updateMapView(mTargetLatlng);
+        }else {
+            isFirst = false;
+        }
+    }
+
+    @OnClick({R.id.iv_scaleUp, R.id.iv_scaleDown, R.id.tv_located, R.id.tv_satellite, R.id.tv_compass, R.id.hide_treasure})
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.iv_scaleUp:
@@ -342,6 +413,13 @@ public class MapFragment extends Fragment implements MapFragmentView {
                 boolean mCompassEnabled = mBaiduMap.getUiSettings().isCompassEnabled();
                 mBaiduMap.getUiSettings().setCompassEnabled(mCompassEnabled);
                 break;
+            case R.id.hide_treasure:
+                String title = mEtTreasureTitle.getText().toString().trim();
+                if (!TextUtils.isEmpty(title)) {
+                    HideTreasureActivity.goHideTreasureActivity(getActivity(), title, mCurrentAddress, mTargetLatlng);
+                } else {
+                    mActivityUtils.showToast("请输入标题");
+                }
         }
     }
 
@@ -375,7 +453,9 @@ public class MapFragment extends Fragment implements MapFragmentView {
 
         Log.e("==================", "" + treasureList.size());
         mBaiduMap.clear();//清除前面的覆盖物
-        mLayoutBottom.setVisibility(View.GONE);
+        if (mCurrentMode != TREASURE_MODE_BURY) {
+            changeUIMode(TREASURE_MODE_NORMAL);
+        }
         for (Treasure treasure : treasureList
                 ) {
             Bundle mBundle = new Bundle();
