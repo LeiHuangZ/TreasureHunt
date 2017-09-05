@@ -1,5 +1,7 @@
 package com.zhuoxin.treasurehunt.treasure.detail;
 
+import android.util.Log;
+
 import com.zhuoxin.treasurehunt.net.RetrofitClient;
 
 import java.util.List;
@@ -30,7 +32,11 @@ class TreasureDetailPresenter {
                         mTreasureDetailView.showResult("未知错误");
                     }
                     assert mDetailResultList != null;
-                    mTreasureDetailView.showDetail(mDetailResultList.get(0));
+                    if (mDetailResultList.size()>0 && mDetailResultList.get(0) != null) {
+                        mTreasureDetailView.showDetail(mDetailResultList.get(0));
+                    }else {
+                        mTreasureDetailView.showDetail(null);
+                    }
                 } else {
                     mTreasureDetailView.showResult("服务器响应异常");
                 }

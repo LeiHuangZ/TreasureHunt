@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.PopupMenu;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.MenuItem;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -110,7 +111,7 @@ public class TreasureDetailActivity extends AppCompatActivity implements Treasur
     //------------------------------------实现自View层接口的方法--------------------------------//
     @Override
     public void showDetail(TreasureDetailResult detailResult) {
-        if (detailResult.description != null && !detailResult.description.equals("")) {
+        if (detailResult!= null && detailResult.description != null && !detailResult.description.equals("")) {
             mTvDetailDescription.setText(detailResult.description);
         } else {
             mTvDetailDescription.setText("没有相关描述");

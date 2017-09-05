@@ -1,7 +1,9 @@
 package com.zhuoxin.treasurehunt.custom;
 
 import android.content.Context;
+import android.preference.PreferenceManager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.RelativeLayout;
@@ -69,9 +71,14 @@ public class TreasureView extends RelativeLayout {
         mTvDistance.setText(distance);
     }
 
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        mUnbinder.unbind();
-    }
+    // TODO: 2017/9/5 解绑Buteerknife
+    PreferenceManager.OnActivityDestroyListener mListener = new PreferenceManager.OnActivityDestroyListener() {
+        @Override
+        public void onActivityDestroy() {
+            mUnbinder.unbind();
+            Log.e("TreasureView", "onActivityDestroy: ");
+        }
+    };
+
+
 }

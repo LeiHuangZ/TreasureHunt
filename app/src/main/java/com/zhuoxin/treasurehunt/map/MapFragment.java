@@ -114,7 +114,6 @@ public class MapFragment extends Fragment implements MapFragmentView {
     private static String mAddrStr;
     private GeoCoder mGeoCoder;
     private String mCurrentAddress;
-    private boolean isFirst = true;
 
     @Nullable
     @Override
@@ -166,7 +165,7 @@ public class MapFragment extends Fragment implements MapFragmentView {
     public static final int TREASURE_MODE_NORMAL = 0;//正常模式
     public static final int TREASURE_MODE_SELECTED = 1;//marker被选中的状态
     public static final int TREASURE_MODE_BURY = 2;//埋藏宝藏状态
-    private int mCurrentMode;//
+    public int mCurrentMode;//
 
     public void changeUIMode(int mode) {
         if (mCurrentMode == mode) {
@@ -382,10 +381,8 @@ public class MapFragment extends Fragment implements MapFragmentView {
     @Override
     public void onStart() {
         super.onStart();
-        if (!isFirst) {
+        if (mTargetLatlng != null) {
             updateMapView(mTargetLatlng);
-        }else {
-            isFirst = false;
         }
     }
 

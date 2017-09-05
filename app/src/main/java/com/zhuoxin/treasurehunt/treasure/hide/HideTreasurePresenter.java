@@ -1,7 +1,5 @@
 package com.zhuoxin.treasurehunt.treasure.hide;
 
-import android.util.Log;
-
 import com.zhuoxin.treasurehunt.net.RetrofitClient;
 import com.zhuoxin.treasurehunt.treasure.TreasureRepo;
 
